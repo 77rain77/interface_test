@@ -1,0 +1,34 @@
+pip install -r requirements.txt    安装文件中的插件
+
+主函数运行方式：
+-v 输出更加详细的运行信息
+-s 输入调试信息
+-n 多线程运行
+--reruns 数字   失败用例重新运行
+--html=报告的路径
+-m "smoke"   只执行冒烟的用例  需要在测试用例上面添加装饰器 @pytest.mark.smoke
+
+setup/teardown  在每个用例之前和之后执行一次
+setup_class/teardown_class 在每个类之前和之后执行一次
+
+部分前置
+@pytest.fixtrue(scope="作用域",params="数据驱动",autouse="自动执行",ids="自定义参数",name="重命名")
+作用域：function,class,module,package/session
+
+例子
+@pytest.fixtrue(scope="function")
+def conn_database():
+print("连接数据库")
+yield  #唤醒类似teardown功能，简单理解就是返回，yield和return都表示返回数据的意思，只是区别在于，yield返回多次以及多个数据，return只会返回一次，return之后不能接代码
+print("关闭数据库")
+
+def aa(conn_database):
+print("这是一个例子")
+#直接传入方法名即可使用该方法
+
+一般情况下：
+@pytest.fixtrue()一般会和conftest.py文件一起使用
+conftest.py名称是固定的，功能很强大。
+1.conftest.py文件是单独存放@pytest.fixtrue()的方法。用处是可以在多个py文件之间共享前置配置
+2.conftest.py里面的方法在调用时不需要导入，可以直接使用
+3.conftest.py可以有多个，也可以有多个不同层级

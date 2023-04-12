@@ -1,0 +1,4 @@
+testData: ../data/testcases.xlsx
+dataJson: ../data/data.json
+headerJson: ../data/header.json
+reportpath: ../report_file/

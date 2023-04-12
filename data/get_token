@@ -1,0 +1,19 @@
+_
+  name: 获得统一的鉴权码token
+  request:
+    method: get
+    url:
+    data:
+      grant_type:
+      appid:
+      secret:
+  validate:
+
+
+
+
+
+
+
+
+
