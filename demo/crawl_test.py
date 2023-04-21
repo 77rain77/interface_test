@@ -1,6 +1,8 @@
+import os
 import time
 import random
 import requests
+from queue import Queue
 from concurrent.futures import ThreadPoolExecutor
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -25,11 +27,12 @@ headers = {
     "User-Agent": random.choice(UA_LIST)
 }
 url = f'https://wallhaven.cc/hot'
-s = Service(r'D:\pytest_\Case\geckodriver.exe')
-fox = webdriver.Firefox(service=s)
+fox = webdriver.Chrome()
+# s = Service(r'D:\pytest_\Case\geckodriver.exe')
+# fox = webdriver.Firefox(service=s)
 fox.get(url)
 time.sleep(1)
-
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 def scroll():
     index = 1
     while True:
@@ -53,46 +56,26 @@ def scroll():
                 break
         index += 1
 
-
-def get_img():
-    original_window = fox.current_window_handle
-    ele = fox.find_elements(By.XPATH, "//a[@class='preview']")
-    for value in ele:
-        value_url = value.get_attribute("href")
-        fox.execute_script("window.open('{}')".format(value_url))
-        for window_handle in fox.window_handles:
-            if window_handle != original_window:
-                fox.switch_to.window(window_handle)
-                break
-        try:
-            WebDriverWait(fox, 5).until(
-                EC.presence_of_element_located((By.XPATH, "//*[@id='wallpaper']")))
-            img = fox.find_element(By.XPATH, "//*[@id='wallpaper']").get_attribute('src')
-            img_list.append(img)
-            with open("img_url.txt", 'a', encoding='utf-8') as w:
-                w.write(img + '\n')
-            print(img)
-        except:
-            pass
-        # 关闭新窗口
-        fox.close()
-        # 切换回原始窗口
-        fox.switch_to.window(original_window)
-
+def request_img():
+    url_ = r"https://w.wallhaven.cc/full/{}/wallhaven-{}"
+    WebDriverWait(fox, 12).until(
+        EC.presence_of_element_located((By.XPATH,"//img[@class='lazyload loaded']")))
+    ele_img = fox.find_elements(By.XPATH,"//img[@class='lazyload loaded']")
+    with ThreadPoolExecutor(max_workers=50) as pool:
+        for key in ele_img:
+            img_url = key.get_attribute("src")
+            # print(url_.format(img_url[-13:-10], img_url[-10:]))
+            pool.submit(images, url_.format(img_url[-13:-10], img_url[-10:]))
+    pool.shutdown()
     fox.quit()
 
-def images(url):
-    result = requests.get(url=url,headers=headers)
-    with open('report/'+url[-10:],'wb') as w:
+def images(i_url):
+    result = requests.get(url=i_url,headers=headers)
+    #with open(r'E:\picture\wallhaven-hot/'+ i_url[-10:],'wb') as w:
+    with open(BASE_DIR + '/data/pictures' + i_url[-10:], 'wb') as w:
         w.write(result.content)
+        print("加载成功~",i_url)
 
 if __name__ == '__main__':
-
-    img_list = []
     scroll()
-    with ThreadPoolExecutor(max_workers=10) as img_pool:
-        img_pool.submit(get_img)
-
-    with ThreadPoolExecutor(max_workers=10) as img_pool:
-        img_pool.map(images, img_list)
-    img_pool.shutdown()
+    request_img()
