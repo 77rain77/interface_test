@@ -72,7 +72,7 @@ def request_img():
 def images(i_url):
     result = requests.get(url=i_url,headers=headers)
     #with open(r'E:\picture\wallhaven-hot/'+ i_url[-10:],'wb') as w:
-    with open(BASE_DIR + '/data/pictures' + i_url[-10:], 'wb') as w:
+    with open(BASE_DIR + '/data/pictures/' + i_url[-10:], 'wb') as w:
         w.write(result.content)
         print("加载成功~",i_url)
 
