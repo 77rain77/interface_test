@@ -39,7 +39,7 @@ class GPT:
             "msg":title,
             "new_session":new_session
         }
-        response = requests.post("https://sdk-test.centaurstech.com/api/sdk/chat", headers=header,json=data)
+        response = requests.post("*****", headers=header,json=data)
         time.sleep(3)
         result = response.text.encode('utf-8').decode('utf-8')
         print(response.text)
@@ -81,7 +81,7 @@ class GPT:
         }
         #requests.adapters.DEFAULT_RETRIES = 5
         try:
-            response = requests.post("http://robot-service-test.centaurstech.com/api/chat",timeout=20,headers=self.header,data=data)
+            response = requests.post("********",timeout=20,headers=self.header,data=data)
             # result=eval(response.text.encode('utf-8').decode("unicode_escape").replace("\n","").replace(" ",""))
             result = response.text.encode('utf-8').decode("unicode_escape").replace("\n", "").replace(r'"', "")
             res = re.search(r"msg:(.*?),", result)
